@@ -1,2 +1,1 @@
-# mcf-img-reco
-Mean Curvature Flow for image recognition
+# Mean Curvature Flow for Image Recognition
