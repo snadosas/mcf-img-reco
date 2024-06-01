@@ -57,6 +57,9 @@ Where:
 
 ![heart example](/anims/heart_example.gif)
 
+## To Do List
+- Fix the method 2 in `MCF.py`
+- Fix `IR_MCF.py`
 
 ## References
 
