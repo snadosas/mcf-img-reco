@@ -19,7 +19,7 @@ It should be called like this inside the project folder
 Where:
 - **method** : An integer that refers to the method used to calculate the flow
   - 1 : Uses finite differences the approximate the curvature and the norm of the gradient directly.
-  - 2 : Uses signed distance function obtained from finite differences and the simplied flow equation.
+  - 2 : Uses signed distance function obtained from finite differences and the simplified flow equation.
   - 3 : Uses signed distance function from the scikit.fmm library and the simplified flow equation.
     (More on those methods can be found in the **context** section)
 - **shape**: Refers to the function whose level set 0 is the closed curve where the flow will be applied, the only built-in functions are 'circle' and 'heart'. This input can also be given as the argument of a function where the first coordinate is x and the second is y, later the function is defined using python's `eval`.
