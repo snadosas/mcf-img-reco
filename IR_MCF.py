@@ -136,8 +136,9 @@ if __name__ == '__main__':
     if not os.path.exists('anims'):
         os.makedirs('anims')
 
-    if os.path.exists('anims/' + gif_title):
-        os.remove('anims/'+ gif_title)
 
+    while os.path.exists('anims/' + gif_title):
+        from datetime import datetime
+        gif_title = gif_title + '-' + datetime.today().strftime('%Y-%m-%d')
 
     rec_anim.save('anims/' + gif_title, writer='pillow')

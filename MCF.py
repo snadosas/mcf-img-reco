@@ -59,7 +59,7 @@ if __name__ == '__main__':
     if len(sys.argv) == 8:
         gif_title = sys.argv[7]
     else:
-        gif_title = 'mcf1.gif'
+        gif_title = 'mcf.gif'
 
     if shape == 'circle':
         shape_f = lambda x,y : x**2 + y**2 - 0.5**2
@@ -89,8 +89,9 @@ if __name__ == '__main__':
     if not os.path.exists('anims'):
         os.makedirs('anims')
 
-    if os.path.exists('anims/' + gif_title):
-        os.remove('anims/'+ gif_title)
+    while os.path.exists('anims/' + gif_title):
+        from datetime import datetime
+        gif_title = gif_title + '-' + datetime.today().strftime('%Y-%m-%d')
 
 
     anima.save('anims/' + gif_title, writer='pillow')
