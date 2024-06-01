@@ -43,6 +43,12 @@ Where:
 - **b** : Size of the velocity of the flow.
 - **gif_title** : Title of the gif to be created.
 
+## Examples
+
+` python MCF.py 1 'circle'  25 200 0.1 0.01 'circle_example.gif'`
+
+![circle example](/anims/circle_example.gif)
+
 ## References
 
 [1] Osher, S., & Fedkiw, R. (2003). Level set methods and dynamic implicit surfaces. In Applied mathematical sciences. 
