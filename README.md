@@ -73,16 +73,18 @@ $$
 $$
 
 In the case where $| \nabla \varphi | = 1 $, the PDE becomes
+
 $$
   \varphi_t = b \Delta \varphi
 $$
+
 this is the case when $\varphi$ is a signed distance function, that is, $|\varphi(x)| = d(x, \Gamma)$ and, for points inside the region defined by $\Gamma$, $\varphi < 0$, and for points outside $\varphi > 0$
 
 ### Finite Differences
 
 ### Image Recognition
 
-Consider a grayscale image $A$, such image can be discretized into a matrix $I$ where each entry represents the brightness of a pixel, one wishes for the flow to stop itself when there's a jump on $\grad I$, that is, a big change of brightness, this is accomplished by solving the following PDE.
+Consider a grayscale image $A$, such image can be discretized into a matrix $I$ where each entry represents the brightness of a pixel, one wishes for the flow to stop itself when there's a jump on $|\nabla I|$, that is, a big change of brightness, this is accomplished by solving the following PDE.
 $$
 \varphi_t = g(| \nabla I|)|\nabla \varphi| \, \text{div} (\frac{\nabla \varphi}{|\nabla \varphi|}) + \nabla g(|\nabla I|) \cdot \nabla \varphi
 $$
