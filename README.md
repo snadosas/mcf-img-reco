@@ -7,6 +7,10 @@ The outline of the project is to first simulate mean curvature flow using finite
 
 ## Use
 
+Clone the repo and open a terminal in the folder of the repo and run 
+
+`pip install requirements.txt`
+
  ``MCF.py`` contains the code related to the simulation of mean curvature flow using an implicit function.
 It should be called like this inside the project folder 
 
