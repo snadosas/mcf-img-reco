@@ -49,6 +49,11 @@ Where:
 
 ![circle example](/anims/circle_example.gif)
 
+`python MCF.py 3 'heart' 30 150 0.1 0.01 'heart_example.gif'`
+
+![heart example](/anims/heart_example.gif)
+
+
 ## References
 
 [1] Osher, S., & Fedkiw, R. (2003). Level set methods and dynamic implicit surfaces. In Applied mathematical sciences. 
