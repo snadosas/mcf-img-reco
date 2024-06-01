@@ -92,7 +92,7 @@ $$
 
 Where $g$ is a positive strictly decreasing function such that $g(0) = 1$ and $\lim_{s \to + \infty}g(s) = 0$.
 
-One such $g$ is $g(x) = (1+x^2)^{-1}.
+One such $g$ is $g(x) = (1+x^2)^{-1}$.
 
 ## To Do List
 - Fix the method 2 in `MCF.py`
