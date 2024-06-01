@@ -2,6 +2,10 @@ import numpy as np
 
 from finite_difference import *
 
+#Calcula la funcion de signo discontinua
+def discont_sgn(phi,dx):
+    return np.sign(phi)
+
 #Calcula la función (en grilla) de la funcion signo sugerida arriba
 def smoothed_sgn(phi_0,dx):
     phi = phi_0.copy()
@@ -18,11 +22,11 @@ def smoothed_sgn_2(phi_0,dx):
     return (phi) / (phi * phi + dx * dx )
 
 #Evoluciona la funcion a traves de la EDP de reinicializacion
-def reinit_fd(phi_0,n_iter,dx,dt,b):
+def reinit_fd(phi_0,n_iter,dx,dt,b, sgn_fn):
 
     phi = phi_0.copy()
     phi_array = [phi]
-    smth_sgn = smoothed_sgn_2(phi_0,dx)
+    smth_sgn = sgn_fn(phi_0,dx)
 
     for i in range(n_iter):
         #print("A.MAX: ", np.max(phi))
@@ -64,12 +68,13 @@ if __name__ == '__main__':
     from aux_functions import *
 
     shape = sys.argv[1]
-    N = int(sys.argv[2])
-    max_iter = int(sys.argv[3])
-    dt = float(sys.argv[4])
-    b = float(sys.argv[5])
-    if len(sys.argv) == 7:
-        gif_title = sys.argv[6]
+    sgn_f = sys.argv[2]
+    N = int(sys.argv[3])
+    max_iter = int(sys.argv[4])
+    dt = float(sys.argv[5])
+    b = float(sys.argv[6])
+    if len(sys.argv) == 8:
+        gif_title = sys.argv[7]
     else:
         gif_title = 'reinit1.gif'
 
@@ -89,7 +94,12 @@ if __name__ == '__main__':
 
     phi_0, dx = to_grid(shape_f, N)
 
-    tmp_phi, tmp_phi_array = reinit_fd(phi_0, max_iter, dx, dt, b)
+    if sgn_f == 'discontinuous':
+        tmp_phi, tmp_phi_array = reinit_fd(phi_0, max_iter, dx, dt, b, discont_sgn)
+    elif sgn_f == 'continuous':
+        tmp_phi, tmp_phi_array = reinit_fd(phi_0, max_iter, dx, dt, b, smoothed_sgn)
+    else:
+        sys.exit(0)
 
 
     anima = anima_array(tmp_phi_array, title)
@@ -97,8 +107,9 @@ if __name__ == '__main__':
     if not os.path.exists('anims'):
         os.makedirs('anims')
 
-    if os.path.exists('anims/' + gif_title):
-        os.remove('anims/'+ gif_title)
+    while os.path.exists('anims/' + gif_title):
+        from datetime import datetime
+        gif_title = gif_title + '-' + datetime.today().strftime('%Y-%m-%d')
 
 
     anima.save('anims/' + gif_title, writer='pillow')
