@@ -1,9 +1,8 @@
 # Mean Curvature Flow for Image Recognition
 
-This repository contains the code of our proyect for the course **Numerical Analysis of PDEs** imparted at the FCFM, Universidad de Chile.
+This repository contains the code of our project for the **Numerical Analysis of PDEs** course in 2024 fall semester at the FCFM, Universidad de Chile.
 
 The outline of the project is to first simulate mean curvature flow using finite differences, and then modify the flow so that it can recognize images.
-
 
 ## Usage
 
@@ -59,7 +58,7 @@ Where:
 
 ## Context
 
-Let $\varphi$
+Let $\Omega = [-1,1]^2$, $\varphi: \Omega \to \mathbb{R}$ be a smooth function on 
 
 ## To Do List
 - Fix the method 2 in `MCF.py`
