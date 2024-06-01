@@ -64,7 +64,7 @@ Let $\Omega = [-1,1]^2$, $\varphi: \Omega \to \mathbb{R}$ be a smooth function, 
 
 In terms of the function $\varphi$, the following geometrical objects can be calculated:
 - The unit normal field $\vec{N} = \frac{\nabla \varphi}{| \nabla \varphi|}$
-- The curvature $\kappa = \nabla \cdot \vec{N} =  (\varphi_x^2 \varphi_{yy} - 2\varphi_x\varphi_y \varphi_{xy}+\varphi_y^2\varphi_{xx} )/|\nabla \varphi|^3
+- The curvature $\kappa = \nabla \cdot \vec{N} =  (\varphi_x^2 \varphi_{yy} - 2\varphi_x\varphi_y \varphi_{xy}+\varphi_y^2\varphi_{xx} )/|\nabla \varphi|^3$
 
 The effect of the flow of a mean curvature normal vector field $\vec{V} = -b\kappa \vec{N}$ on $\Gamma$ where $b > 0$ is some constant, can be written in as a PDE on $\varphi$
 
