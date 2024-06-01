@@ -58,7 +58,37 @@ Where:
 
 ## Context
 
-Let $\Omega = [-1,1]^2$, $\varphi: \Omega \to \mathbb{R}$ be a smooth function on 
+### Mean Curvature Flow
+
+Let $\Omega = [-1,1]^2$, $\varphi: \Omega \to \mathbb{R}$ be a smooth function, let $\Gamma = \{ x \in \Omega, \varphi(x) = 0 \} the level set $0$ of $\varphi$, suppose that $\Gamma$ is a closed curve that is a subset of $(0,1)^2$.
+
+In terms of the function $\varphi$, the following geometrical objects can be calculated:
+- The unit normal field $\vec{N} = \frac{\nabla \varphi}{| \nabla \varphi|}$
+- The curvature $\kappa = \nabla \cdot \vec{N} =  (\varphi_x^2 \varphi_{yy} - 2\varphi_x\varphi_y \varphi_{xy}+\varphi_y^2\varphi_{xx} )/|\nabla \varphi|^3
+
+The effect of the flow of a mean curvature normal vector field $\vec{V} = -b\kappa \vec{N}$ on $\Gamma$ where $b > 0$ is some constant, can be written in as a PDE on $\varphi$
+
+$$
+  \varphi_t = b\kappa | \nabla \varphi | 
+$$
+
+In the case where $| \nabla \varphi | = 1 $, the PDE becomes
+$$
+  \varphi_t = b \Delta \varphi
+$$
+this is the case when $\varphi$ is a signed distance function, that is, $|\varphi(x)| = d(x, \Gamma)$ and, for points inside the region defined by $\Gamma$, $\varphi < 0$, and for points outside $\varphi > 0$
+
+### Finite Differences
+
+### Image Recognition
+
+Consider a grayscale image $A$, such image can be discretized into a matrix $I$ where each entry represents the brightness of a pixel, one wishes for the flow to stop itself when there's a jump on $\grad I$, that is, a big change of brightness, this is accomplished by solving the following PDE.
+$$
+\varphi_t = g(| \nabla I|)|\nabla \varphi| \, \text{div} (\frac{\nabla \varphi}{|\nabla \varphi|}) + \nabla g(|\nabla I|) \cdot \nabla \varphi
+$$
+Where $g$ is a positive strictly decreasing function such that $g(0) = 1$ and $\lim_{s \to + \infty}g(s) = 0$.
+
+One such $g$ is $g(x) = (1+x^2)^{-1}.
 
 ## To Do List
 - Fix the method 2 in `MCF.py`
