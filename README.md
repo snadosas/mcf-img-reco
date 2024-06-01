@@ -85,9 +85,11 @@ this is the case when $\varphi$ is a signed distance function, that is, $|\varph
 ### Image Recognition
 
 Consider a grayscale image $A$, such image can be discretized into a matrix $I$ where each entry represents the brightness of a pixel, one wishes for the flow to stop itself when there's a jump on $|\nabla I|$, that is, a big change of brightness, this is accomplished by solving the following PDE.
+
 $$
 \varphi_t = g(| \nabla I|)|\nabla \varphi| \, \text{div} (\frac{\nabla \varphi}{|\nabla \varphi|}) + \nabla g(|\nabla I|) \cdot \nabla \varphi
 $$
+
 Where $g$ is a positive strictly decreasing function such that $g(0) = 1$ and $\lim_{s \to + \infty}g(s) = 0$.
 
 One such $g$ is $g(x) = (1+x^2)^{-1}.
