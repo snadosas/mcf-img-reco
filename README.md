@@ -5,7 +5,7 @@ This repository contains the code of our proyect for the course **Numerical Anal
 The outline of the project is to first simulate mean curvature flow using finite differences, and then modify the flow so that it can recognize images.
 
 
-## Use
+## Usage
 
 Clone the repo and open a terminal in the folder of the repo and run 
 
@@ -56,6 +56,10 @@ Where:
 `python MCF.py 3 'heart' 30 150 0.1 0.01 'heart_example.gif'`
 
 ![heart example](/anims/heart_example.gif)
+
+## Context
+
+Let $\varphi$
 
 ## To Do List
 - Fix the method 2 in `MCF.py`
