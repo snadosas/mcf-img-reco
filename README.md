@@ -60,7 +60,7 @@ Where:
 
 ### Mean Curvature Flow
 
-Let $\Omega = [-1,1]^2$, $\varphi: \Omega \to \mathbb{R}$ be a smooth function, let $\Gamma = \{ x \in \Omega, \varphi(x) = 0 \}$ the level set $0$ of $\varphi$, suppose that $\Gamma$ is a closed curve that is a subset of $(0,1)^2$.
+Let $\Omega = [-1,1]^2$, $\varphi: \Omega \to \mathbb{R}$ be a smooth function, let $\Gamma = { x \in \Omega, \varphi(x) = 0 }$ the level set $0$ of $\varphi$, suppose that $\Gamma$ is a closed curve that is a subset of $(0,1)^2$.
 
 In terms of the function $\varphi$, the following geometrical objects can be calculated:
 - The unit normal field $\vec{N} = \frac{\nabla \varphi}{| \nabla \varphi|}$
