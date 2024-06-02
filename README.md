@@ -78,7 +78,7 @@ $$
   \varphi_t = b \Delta \varphi
 $$
 
-this is the case when $\varphi$ is a signed distance function, that is, $|\varphi(x)| = d(x, \Gamma)$ and, for points inside the region defined by $\Gamma$, $\varphi < 0$, and for points outside $\varphi > 0$
+this is the case when $\varphi$ is a signed distance function, that is, $|\varphi(x)| = d(x, \Gamma)$ and, for points inside the region defined by $\Gamma$, $\varphi < 0$, and for points outside $\varphi > 0$.
 
 ### Finite Differences
 
