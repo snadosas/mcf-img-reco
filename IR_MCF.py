@@ -16,26 +16,22 @@ def g(x):
 
 # Flujo segmentador #Utiliza signed distance function
 def SF_1(Img_0,max_iter,dt,b):
+    #Discretización de la curva inicial (cuadrado)
     N = Img_0.shape[0]
     phi, dx = to_grid(square,N)
     dx = float(dx)
     phi = skfmm.distance(phi, dx=dx, order=1)
     phi_hist = [phi]
 
-
+    #Se calcula el gradiente de g compuesto con la norma del gradiente de Img_0
     grad_I_x,grad_I_y = fd_gradient(Img_0,dx)
     norm_grad_I  = np.sqrt( grad_I_x*grad_I_x + grad_I_y*grad_I_y)
     g_I= g(norm_grad_I)
     grad_gI_x,grad_gI_y = fd_gradient(g_I,dx)
 
     for _ in range(max_iter):
-
+        # Compute the gradient of phi
         grad_x,grad_y = fd_gradient(phi,dx)
-        hess_x,hess_y = fd_hessian(phi,dx)
-        _, hess_xy = fd_gradient(grad_x,dx)
-
-        norm_grad = np.sqrt( grad_x * grad_x + grad_y * grad_y )
-        curv = grad_x * grad_x * hess_y - 2 * grad_x * grad_y * hess_xy  + grad_y * grad_y * hess_x
 
         phi = np.pad(phi, 1, mode='maximum')
 
@@ -44,8 +40,8 @@ def SF_1(Img_0,max_iter,dt,b):
                     np.roll(phi, 1, axis=1) + np.roll(phi, -1, axis=1) - \
                     4 * phi) / (dx * dx))
 
-
-        phi = phi[1:-1, 1:-1] + dt*b*laplacian[1:-1, 1:-1]*g_I + dt*b*(grad_gI_x*grad_x + grad_gI_y*grad_x)
+        #euler forward
+        phi = phi[1:-1, 1:-1] + dt*b*laplacian[1:-1, 1:-1]*g_I + dt*b*(grad_gI_x*grad_x + grad_gI_y*grad_y)
 
 
         phi = skfmm.distance(phi, dx=dx, order=1)
@@ -79,13 +75,7 @@ def SF_2(Img_0,max_iter,dt,b):
 
         phi = np.pad(phi, 1, mode='maximum')
 
-        # Compute the Laplacian using central difference scheme
-        laplacian = ((np.roll(phi, 1, axis=0) + np.roll(phi, -1, axis=0) + \
-                    np.roll(phi, 1, axis=1) + np.roll(phi, -1, axis=1) - \
-                    4 * phi) / (dx * dx))
-
-
-        phi = phi[1:-1, 1:-1] + dt*b*curv*norm_grad*g_I + dt*b*(grad_gI_x*grad_x + grad_gI_y*grad_x)
+        phi = phi[1:-1, 1:-1] + dt*b*curv*norm_grad*g_I + dt*b*(grad_gI_x*grad_x + grad_gI_y*grad_y)
 
 
         #phi = skfmm.distance(phi, dx=dx, order=1)
