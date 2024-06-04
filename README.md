@@ -40,7 +40,7 @@ Where:
   - 2 : Uses finite differences the approximate the curvature and the norm of the gradient directly.
     (More on those methods can be found in the **context** section)
 - **image_dir**: Directory of the image.
-- **N_factor** : Refers to the factor the resolution of the image will be rescaled. 
+- **desired_res** : Refers to the resolution of the image that will be used in the code. 
 - **n_iter** : Refers to the number of steps the curve will be evolved due to the flow.
 - **dt** : Size of the time step.
 - **b** : Size of the velocity of the flow.
@@ -58,7 +58,11 @@ Where:
 
 `python .\IR_MCF.py 2 'img/circle.png' 4 200 0.05 0.01 'SF_circle.gif'` 
 
-![circle_recp example](/anims/SF_circle.gif)
+![circle_reco example](/anims/SF_circle.gif)
+
+`python .\IR_MCF.py 2 'img/circle.png' 64 800 0.05 0.01 'SF_bean3.gif'` 
+
+![bean_reco example](/anims/SF_bean3.gif)
 
 ## Context
 
@@ -101,6 +105,7 @@ One such $g$ is $g(x) = (1+x^2)^{-1}$.
 ## To Do List
 - Fix the method 2 in `MCF.py`
 - Fix `IR_MCF.py`
+- Add the Finite Differences Context
 
 ## References
 

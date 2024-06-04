@@ -33,7 +33,10 @@ def SF_1(Img_0,max_iter,dt,b):
         # Compute the gradient of phi
         grad_x,grad_y = fd_gradient(phi,dx)
 
-        phi = np.pad(phi, 1, mode='maximum')
+        #phi = np.pad(phi, 1, mode='maximum')
+        #phi = np.pad(phi, 1, mode='constant', constant_values=(0))
+        #phi = np.pad(phi, 1, mode='edge')
+        phi = np.pad(phi, 1, mode='constant', constant_values=(1))
 
         # Compute the Laplacian using central difference scheme
         laplacian = ((np.roll(phi, 1, axis=0) + np.roll(phi, -1, axis=0) + \
@@ -84,11 +87,10 @@ def SF_2(Img_0,max_iter,dt,b):
 
     return phi, phi_hist
 
-
 if __name__ == '__main__':
     method = str(sys.argv[1])
     image_dir = str(sys.argv[2])
-    N_factor = int(sys.argv[3])
+    desired_res = int(sys.argv[3])
     max_iter = int(sys.argv[4])
     dt = float(sys.argv[5])
     b = float(sys.argv[6])
@@ -109,7 +111,8 @@ if __name__ == '__main__':
     image_array = np.array(gray_image)
 
     #Se hace cuadrada la imagen y se reduce de acuerdo a N_factor
-    max_asp = max(image_array.shape) // N_factor
+    #max_asp = max(image_array.shape) // N_factor
+    max_asp = desired_res
     print('Resolution has been reduced to: ', max_asp)
 
     image_array = np.array(gray_image.resize((max_asp, max_asp)))
@@ -132,3 +135,4 @@ if __name__ == '__main__':
         gif_title = gif_title + '-' + datetime.today().strftime('%Y-%m-%d')
 
     rec_anim.save('anims/' + gif_title, writer='pillow')
+
