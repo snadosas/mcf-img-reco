@@ -56,6 +56,10 @@ Where:
 
 ![heart example](/anims/heart_example.gif)
 
+`python .\IR_MCF.py 2 'img/circle.png' 4 200 0.05 0.01 'SF_circle.gif'` 
+
+![circle_recp example](/anims/SF_circle.gif)
+
 ## Context
 
 ### Mean Curvature Flow
