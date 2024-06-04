@@ -60,7 +60,7 @@ Where:
 
 ![circle_reco example](/anims/SF_circle.gif)
 
-`python .\IR_MCF.py 2 'img/circle.png' 64 800 0.05 0.01 'SF_bean3.gif'` 
+`python .\IR_MCF.py 1 'img/circle.png' 64 800 0.05 0.01 'SF_bean3.gif'` 
 
 ![bean_reco example](/anims/SF_bean3.gif)
 
