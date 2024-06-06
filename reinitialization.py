@@ -21,11 +21,33 @@ def smoothed_sgn_2(phi_0,dx):
 
     return (phi) / (phi * phi + dx * dx )
 
+# Funcion con signo con argumento identico a smth_sgn_2, pero con un thresold que controle que no explota
+def smoothed_sgn_3(phi_0,dx):
+    phi = phi_0.copy()
+
+    phi = (phi) / (phi * phi + dx * dx )
+
+    n = phi.shape[0]
+    #Control de que no explote
+    for i in range(n):
+        for j in range(n):
+            if phi[i,j] > 1:
+                phi[i,j] = 1
+            elif phi[i,j] < -1:
+                phi[i,j] = -1
+
+    from scipy.ndimage import gaussian_filter
+
+    return gaussian_filter(phi, sigma=0.1)
+
 #Evoluciona la funcion a traves de la EDP de reinicializacion
 def reinit_fd(phi_0,n_iter,dx,dt,b, sgn_fn):
 
     phi = phi_0.copy()
     phi_array = [phi]
+    phi_x, phi_y = fd_gradient(phi,dx)
+    phi_x_array = [phi_x]
+    phi_y_array = [phi_y]
     smth_sgn = sgn_fn(phi_0,dx)
 
     for i in range(n_iter):
@@ -55,11 +77,23 @@ def reinit_fd(phi_0,n_iter,dx,dt,b, sgn_fn):
 
         phi_3_2 = phi_1_2 - dt* b * smth_sgn * ( norm_grad - 1)
 
-        phi = (1/3)*phi+(2/3)*phi_1_2
+        phi = (1/3)*phi+(2/3)*phi_3_2
+        phi_x, phi_y = fd_gradient(phi, dx)
+
 
         phi_array.append(phi.copy())
+        phi_x_array.append(phi_x.copy())
+        phi_y_array.append(phi_y.copy())
 
-    return phi,phi_array
+
+        #g_x, g_y = fd_gradient(phi,dx)
+        #n = np.sqrt(g_x*g_x+g_y*g_y)
+        #s = dt* b * smth_sgn * ( n - 1)
+        #print('a',np.mean(n[1:-1, 1:-1]), '\t',np.max(n[1:-1, 1:-1]), '\t',np.min(n[1:-1, 1:-1]))
+        #print('s',np.mean(s[1:-1, 1:-1]), '\t',np.max(s[1:-1, 1:-1]), '\t',np.min(s[1:-1, 1:-1]))
+
+
+    return phi,phi_array, phi_x_array, phi_y_array
 
 if __name__ == '__main__':
     import sys
@@ -95,14 +129,16 @@ if __name__ == '__main__':
     phi_0, dx = to_grid(shape_f, N)
 
     if sgn_f == 'discontinuous':
-        tmp_phi, tmp_phi_array = reinit_fd(phi_0, max_iter, dx, dt, b, discont_sgn)
+        tmp_phi, tmp_phi_array, tmp_phi_x_array, tmp_phi_y_array = reinit_fd(phi_0, max_iter, dx, dt, b, discont_sgn)
     elif sgn_f == 'continuous':
-        tmp_phi, tmp_phi_array = reinit_fd(phi_0, max_iter, dx, dt, b, smoothed_sgn)
+        tmp_phi, tmp_phi_array, tmp_phi_x_array, tmp_phi_y_array = reinit_fd(phi_0, max_iter, dx, dt, b, smoothed_sgn_3)
     else:
         sys.exit(0)
 
 
-    anima = anima_array(tmp_phi_array, title)
+    #anima = anima_array(tmp_phi_array, title)
+    #anima = anima_vector_field(tmp_phi_x_array,tmp_phi_y_array,title)
+    anima = anima_VF_arr(tmp_phi_array,tmp_phi_x_array,tmp_phi_y_array,'Reinitialized Function','Gradient of reinitialized function')
 
     if not os.path.exists('anims'):
         os.makedirs('anims')
@@ -113,3 +149,7 @@ if __name__ == '__main__':
 
 
     anima.save('anims/' + gif_title, writer='pillow')
+
+    #import skfmm
+
+    #print(np.max(np.abs(tmp_phi_array[-1] - skfmm.distance(tmp_phi_array[-1], dx=float(dx), order=1))))
