@@ -51,6 +51,7 @@ def SF_1(Img_0,max_iter,dt,b):
 
         phi_hist.append(phi.copy())
 
+
     return phi, phi_hist
 
 # Flujo segmentador
@@ -83,6 +84,18 @@ def SF_2(Img_0,max_iter,dt,b):
 
         #phi = skfmm.distance(phi, dx=dx, order=1)
 
+        # normalization routine
+        '''for i in range(phi.shape[0]):
+            for j in range(phi.shape[0]):
+                if phi[i,j] > 1:
+                    phi[i,j] = 1
+                elif phi[i,j] < -1 :
+                    phi[i, j] = -1
+
+        from scipy.ndimage import gaussian_filter
+
+        phi =  gaussian_filter(phi, sigma=0.1)
+        #print('max: ', np.max(np.abs(phi)))'''
         phi_hist.append(phi.copy())
 
     return phi, phi_hist
