@@ -87,6 +87,76 @@ def SF_2(Img_0,max_iter,dt,b):
 
     return phi, phi_hist
 
+# Runge Kutta con  scikit
+def SF_3(Img_0,max_iter,dt,b):
+    #Discretización de la curva inicial (cuadrado)
+    N = Img_0.shape[0]
+    phi, dx = to_grid(square,N)
+    dx = float(dx)
+    phi = skfmm.distance(phi, dx=dx, order=1)
+    phi_hist = [phi]
+
+    #Se calcula el gradiente de g compuesto con la norma del gradiente de Img_0
+    grad_I_x,grad_I_y = fd_gradient(Img_0,dx)
+    norm_grad_I  = np.sqrt( grad_I_x*grad_I_x + grad_I_y*grad_I_y)
+    g_I= g(norm_grad_I)
+    grad_gI_x,grad_gI_y = fd_gradient(g_I,dx)
+
+    for _ in range(max_iter):
+        # Compute the gradient of phi
+        grad_x,grad_y = fd_gradient(phi,dx)
+
+        #phi = np.pad(phi, 1, mode='maximum')
+        #phi = np.pad(phi, 1, mode='constant', constant_values=(0))
+        #phi = np.pad(phi, 1, mode='edge')
+        phi = np.pad(phi, 1, mode='constant', constant_values=(1))
+
+        # Compute the Laplacian using central difference scheme
+        laplacian = ((np.roll(phi, 1, axis=0) + np.roll(phi, -1, axis=0) + \
+                    np.roll(phi, 1, axis=1) + np.roll(phi, -1, axis=1) - \
+                    4 * phi) / (dx * dx))
+
+        #RK
+        phi_1 = phi[1:-1, 1:-1] + dt*b*laplacian[1:-1, 1:-1]*g_I + dt*b*(grad_gI_x*grad_x + grad_gI_y*grad_y)
+        phi_1 = skfmm.distance(phi_1, dx=dx, order=1)
+        grad_x, grad_y = fd_gradient(phi_1, dx)
+        phi_1 = np.pad(phi_1, 1, mode='constant', constant_values=(1))
+
+        # Compute the Laplacian using central difference scheme
+        laplacian = ((np.roll(phi_1, 1, axis=0) + np.roll(phi_1, -1, axis=0) + \
+                      np.roll(phi_1, 1, axis=1) + np.roll(phi_1, -1, axis=1) - \
+                      4 * phi_1) / (dx * dx))
+
+        # RK
+
+
+        phi_2 = phi_1[1:-1, 1:-1] + dt * b * laplacian[1:-1, 1:-1] * g_I + dt * b * (
+                    grad_gI_x * grad_x + grad_gI_y * grad_y)
+
+        phi_2= skfmm.distance(phi_2, dx=dx, order=1)
+
+        phi_1_2 = 0.75 * phi[1:-1, 1:-1] + 0.25 * phi_2
+        phi_1_2 = skfmm.distance(phi_1_2, dx=dx, order=1)
+        grad_x, grad_y = fd_gradient(phi_1_2, dx)
+
+        phi_1_2 = np.pad(phi_1_2, 1, mode='constant', constant_values=(1))
+
+        laplacian = ((np.roll(phi_1_2, 1, axis=0) + np.roll(phi_1_2, -1, axis=0) + \
+                      np.roll(phi_1_2, 1, axis=1) + np.roll(phi_1_2, -1, axis=1) - \
+                      4 * phi_1_2) / (dx * dx))
+
+
+
+        phi_3_2 = phi_1_2[1:-1, 1:-1] + dt * b * laplacian[1:-1, 1:-1] * g_I + dt * b * (
+                grad_gI_x * grad_x + grad_gI_y * grad_y)
+
+        phi = (1 / 3) * phi[1:-1, 1:-1] + (2 / 3) * phi_3_2
+        phi = skfmm.distance(phi, dx=dx, order=1)
+
+        phi_hist.append(phi.copy())
+
+    return phi, phi_hist
+
 if __name__ == '__main__':
     method = str(sys.argv[1])
     image_dir = str(sys.argv[2])
@@ -121,6 +191,8 @@ if __name__ == '__main__':
         test_rec, test_rec_hist = SF_1(image_array, max_iter, dt, b)
     elif method == '2':
         test_rec, test_rec_hist = SF_2(image_array, max_iter, dt, b)
+    elif method == '3':
+        test_rec, test_rec_hist = SF_3(image_array, max_iter, dt, b)
     else:
         sys.exit(0)
 

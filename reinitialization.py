@@ -41,7 +41,7 @@ def smoothed_sgn_3(phi_0,dx):
     return gaussian_filter(phi, sigma=0.1)
 
 #Evoluciona la funcion a traves de la EDP de reinicializacion
-def reinit_fd(phi_0,n_iter,dx,dt,b, sgn_fn):
+def reinit_fd(phi_0,n_iter,dx,dt,b, sgn_fn, thresold = 0.001):
 
     phi = phi_0.copy()
     phi_array = [phi]
@@ -86,12 +86,20 @@ def reinit_fd(phi_0,n_iter,dx,dt,b, sgn_fn):
         phi_y_array.append(phi_y.copy())
 
 
-        #g_x, g_y = fd_gradient(phi,dx)
-        #n = np.sqrt(g_x*g_x+g_y*g_y)
-        #s = dt* b * smth_sgn * ( n - 1)
+        g_x, g_y = fd_gradient(phi,dx)
+        slope = dt* b * smth_sgn * ( np.sqrt(g_x*g_x+g_y*g_y) - 1)
+
+        print(np.sum( np.abs(slope) < thresold), phi_0.shape[0]*phi_0.shape[0]*0.8)
+        print('m' , np.mean(np.abs(slope)))
+        if np.sum(np.abs(slope) < thresold ) > phi_0.shape[0]*phi_0.shape[0]*0.8 :
+            print("Breaking on :", i)
+            break
         #print('a',np.mean(n[1:-1, 1:-1]), '\t',np.max(n[1:-1, 1:-1]), '\t',np.min(n[1:-1, 1:-1]))
         #print('s',np.mean(s[1:-1, 1:-1]), '\t',np.max(s[1:-1, 1:-1]), '\t',np.min(s[1:-1, 1:-1]))
 
+    if i == n_iter-1:
+        print("Max Iteration achieved")
+        sys.exit(0)
 
     return phi,phi_array, phi_x_array, phi_y_array
 
@@ -147,7 +155,7 @@ if __name__ == '__main__':
         from datetime import datetime
         gif_title = gif_title + '-' + datetime.today().strftime('%Y-%m-%d')
 
-
+    print("Writing...")
     anima.save('anims/' + gif_title, writer='pillow')
 
     #import skfmm
