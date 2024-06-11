@@ -44,7 +44,21 @@ def SF_1(Img_0,max_iter,dt,b):
                     4 * phi) / (dx * dx))
 
         #euler forward
-        phi = phi[1:-1, 1:-1] + dt*b*laplacian[1:-1, 1:-1]*g_I + dt*b*(grad_gI_x*grad_x + grad_gI_y*grad_y)
+        slope1 = dt*b*laplacian[1:-1, 1:-1]*g_I
+        slope2 = dt*b*(grad_gI_x*grad_x + grad_gI_y*grad_y)
+
+        #Caso localmente color constante
+        for i in range(slope2.shape[0]):
+            for j in range(slope2.shape[1]):
+                if grad_I_x[i,j] == 0 and grad_I_y[i,j] == 0:
+                    slope2[i,j] = 0
+                    if laplacian[i+1,j+1] < 0.01: #Caso Curvatura Plana en color plano
+                        slope1[i,j] = 0.001
+
+
+        phi = phi[1:-1, 1:-1] + slope1 + slope2
+
+        #phi = phi[1:-1, 1:-1] + dt*b*laplacian[1:-1, 1:-1]*g_I + dt*b*(grad_gI_x*grad_x + grad_gI_y*grad_y)
 
 
         phi = skfmm.distance(phi, dx=dx, order=1)
@@ -63,7 +77,7 @@ def SF_2(Img_0,max_iter,dt,b):
     phi_hist = [phi]
 
 
-    grad_I_x,grad_I_y = fd_gradient(Img_0,dx)
+    grad_I_x,grad_I_y = fd_gradient(Img_0,dx, 255)
     norm_grad_I  = np.sqrt( grad_I_x*grad_I_x + grad_I_y*grad_I_y)
     g_I= g(norm_grad_I)
     grad_gI_x,grad_gI_y = fd_gradient(g_I,dx)
@@ -74,12 +88,25 @@ def SF_2(Img_0,max_iter,dt,b):
         hess_x,hess_y = fd_hessian(phi,dx)
         _, hess_xy = fd_gradient(grad_x,dx)
 
-        norm_grad = np.sqrt( grad_x * grad_x + grad_y * grad_y )
+        #print('gx: ', grad_x)
+
+        norm_grad =  grad_x * grad_x + grad_y * grad_y
         curv = grad_x * grad_x * hess_y - 2 * grad_x * grad_y * hess_xy  + grad_y * grad_y * hess_x
 
-        phi = np.pad(phi, 1, mode='maximum')
+        #print('c: ', curv)
 
-        phi = phi[1:-1, 1:-1] + dt*b*curv*norm_grad*g_I + dt*b*(grad_gI_x*grad_x + grad_gI_y*grad_y)
+        deno = norm_grad
+
+        #print('deno: ',deno)
+        slope1 = dt*b*curv*g_I/deno
+        slope2 =  dt*b*(grad_gI_x*grad_x + grad_gI_y*grad_y)
+
+        for i in range(slope2.shape[0]):
+            for j in range(slope2.shape[1]):
+                if grad_I_x[i,j] < 0.001 and grad_I_y[i,j] < 0.001:
+                    slope2[i,j] = 0
+
+        phi = phi + slope1 + slope2
 
 
         #phi = skfmm.distance(phi, dx=dx, order=1)
@@ -198,7 +225,7 @@ if __name__ == '__main__':
     max_asp = desired_res
     print('Resolution has been reduced to: ', max_asp)
 
-    image_array = np.array(gray_image.resize((max_asp, max_asp)))
+    image_array = np.array(gray_image.resize((max_asp, max_asp))) / 255
 
     if method == '1':
         test_rec, test_rec_hist = SF_1(image_array, max_iter, dt, b)

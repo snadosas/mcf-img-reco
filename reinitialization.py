@@ -1,5 +1,5 @@
 import numpy as np
-
+import sys
 from finite_difference import *
 
 #Calcula la funcion de signo discontinua
@@ -89,8 +89,8 @@ def reinit_fd(phi_0,n_iter,dx,dt,b, sgn_fn, thresold = 0.001):
         g_x, g_y = fd_gradient(phi,dx)
         slope = dt* b * smth_sgn * ( np.sqrt(g_x*g_x+g_y*g_y) - 1)
 
-        print(np.sum( np.abs(slope) < thresold), phi_0.shape[0]*phi_0.shape[0]*0.8)
-        print('m' , np.mean(np.abs(slope)))
+        #print(np.sum( np.abs(slope) < thresold), phi_0.shape[0]*phi_0.shape[0]*0.8)
+        #print('m' , np.mean(np.abs(slope)))
         if np.sum(np.abs(slope) < thresold ) > phi_0.shape[0]*phi_0.shape[0]*0.8 :
             print("Breaking on :", i)
             break
@@ -99,7 +99,7 @@ def reinit_fd(phi_0,n_iter,dx,dt,b, sgn_fn, thresold = 0.001):
 
     if i == n_iter-1:
         print("Max Iteration achieved")
-        sys.exit(0)
+        #sys.exit(0)
 
     return phi,phi_array, phi_x_array, phi_y_array
 

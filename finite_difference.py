@@ -3,8 +3,8 @@ import numpy as np
 
 #Diferencias finitas para primeras derivadas
 # (second order central difference)
-def fd_gradient(phi_0,h):
-    phi_pad = np.pad(phi_0, 1, mode='maximum')
+def fd_gradient(phi_0,h, pad_val=1):
+    phi_pad = np.pad(phi_0, 1, mode='constant', constant_values=(pad_val))
     dif_x = (np.roll(phi_pad, -1, axis=1) - np.roll(phi_pad, 1, axis=1))/(2*h)
     dif_y = (np.roll(phi_pad, -1, axis=0) - np.roll(phi_pad, 1, axis=0))/(2*h)
 
@@ -12,7 +12,7 @@ def fd_gradient(phi_0,h):
 
 #Diferencias finitas para segundas derivadas
 def fd_hessian(phi_0,h):
-    phi_pad = np.pad(phi_0, 1, mode='maximum')
+    phi_pad = np.pad(phi_0, 1, mode='constant', constant_values=(1))
     dif_x = (np.roll(phi_pad, -1, axis=1) + np.roll(phi_pad, 1, axis=1) - 2*phi_pad)/(h*h)
     dif_y = (np.roll(phi_pad, -1, axis=0) + np.roll(phi_pad, 1, axis=0) - 2*phi_pad)/(h*h)
 
@@ -20,7 +20,7 @@ def fd_hessian(phi_0,h):
 
 #Calcula el gradiente usando esquemas no simetricos (forward y backward)
 def fd_gradient_nonsym(phi_0,h):
-    phi_pad = np.pad(phi_0, 1, mode='maximum')
+    phi_pad = np.pad(phi_0, 1, mode='constant', constant_values=(1))
     dif_x_forw = (np.roll(phi_pad, -1, axis=1) - phi_pad)/(h)
     dif_x_back = (phi_pad - np.roll(phi_pad, 1, axis=1))/(h)
     dif_y_forw = (np.roll(phi_pad, -1, axis=0) - phi_pad)/(h)

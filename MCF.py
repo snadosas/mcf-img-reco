@@ -4,6 +4,7 @@ import os
 
 from  aux_functions import *
 from finite_difference import *
+from reinitialization import *
 import skfmm
 
 def MCF_1(phi_0,n_iter,dx,dt,b):
@@ -26,7 +27,26 @@ def MCF_1(phi_0,n_iter,dx,dt,b):
 
     return phi, phi_array
 
+def MCF_2(phi_0, max_iter , dx , dt, b ): #Usa nuestra signed distance function
 
+    #phi = phi_0.copy()
+    phi_hist = []
+    phi, _, _, _ = reinit_fd(phi_0,max_iter*10,dx,dt,b, smoothed_sgn_3, thresold = 0.001)
+    for _ in range(max_iter):
+        phi = np.pad(phi, 1, mode='maximum')
+
+        # Compute the Laplacian using central difference scheme
+        laplacian = ((np.roll(phi, 1, axis=0) + np.roll(phi, -1, axis=0) + \
+                    np.roll(phi, 1, axis=1) + np.roll(phi, -1, axis=1) - \
+                    4 * phi) / (dx * dx))
+
+        phi = phi + dt*b*laplacian
+
+        phi, _, _, _ = reinit_fd(phi[1:-1, 1:-1],max_iter*10,dx,dt,b, smoothed_sgn_3, thresold = 0.001)
+
+        phi_hist.append(phi.copy())
+
+    return phi, phi_hist
 
 def MCF_3(phi_0, max_iter , dx , dt, b ): #Codigo modificado de chatGPT y snapshot anterior
 
@@ -79,6 +99,8 @@ if __name__ == '__main__':
 
     if method == '1':
         tmp_phi, tmp_phi_array = MCF_1(phi_0,max_iter,dx,dt,b)
+    elif method == '2':
+        tmp_phi, tmp_phi_array = MCF_2(phi_0, max_iter, dx, dt, b)
     elif method == '3':
         tmp_phi, tmp_phi_array = MCF_3(phi_0,max_iter,float(dx) , dt, b)
     else:
