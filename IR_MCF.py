@@ -5,6 +5,7 @@ import os
 from PIL import Image
 from  aux_functions import *
 from finite_difference import *
+from reinitialization import *
 import skfmm
 import time
 
@@ -81,16 +82,20 @@ def SF_2(Img_0,max_iter,dt,b):
     phi_hist = [phi]
 
 
-    grad_I_x,grad_I_y = fd_gradient(Img_0,dx, 255)
+    grad_I_x,grad_I_y = fd_gradient(Img_0,dx, 'edge')
     norm_grad_I  = np.sqrt( grad_I_x*grad_I_x + grad_I_y*grad_I_y)
     g_I= g(norm_grad_I)
     grad_gI_x,grad_gI_y = fd_gradient(g_I,dx)
 
+    print("mg: ", np.max(np.abs(g_I)))
+    print("mgx: ", np.max(np.abs(grad_gI_x)))
+    print("mgy: ", np.max(np.abs(grad_gI_y)))
+
     for _ in range(max_iter):
 
-        grad_x,grad_y = fd_gradient(phi,dx)
-        hess_x,hess_y = fd_hessian(phi,dx)
-        _, hess_xy = fd_gradient(grad_x,dx)
+        grad_x,grad_y = fd_gradient(phi,dx,'edge')
+        hess_x,hess_y = fd_hessian(phi,dx,'edge')
+        _, hess_xy = fd_gradient(grad_x,dx,'edge')
 
         #print('gx: ', grad_x)
 
@@ -99,14 +104,16 @@ def SF_2(Img_0,max_iter,dt,b):
 
         #print('c: ', curv)
 
-        deno = norm_grad
+        deno = norm_grad + 0.01
+        #print(np.mean(np.abs(deno)))
 
-        #print('deno: ',deno)
+        print('deno: ',deno)
+        print("------------")
         slope1 = dt*b*curv*g_I/deno
-        slope2 =  dt*b*(grad_gI_x*grad_x + grad_gI_y*grad_y)
+        slope2 = dt*b*(grad_gI_x*grad_x + grad_gI_y*grad_y)
 
-        for i in range(slope2.shape[0]):
-            for j in range(slope2.shape[1]):
+        for i in range(phi.shape[0]):
+            for j in range(phi.shape[1]):
                 if grad_I_x[i,j] < 0.001 and grad_I_y[i,j] < 0.001:
                     slope2[i,j] = 0
 
@@ -127,6 +134,11 @@ def SF_2(Img_0,max_iter,dt,b):
 
         phi =  gaussian_filter(phi, sigma=0.1)
         #print('max: ', np.max(np.abs(phi)))'''
+
+        # second normalization routine
+        #print('max:', np.max(np.abs(phi)))
+        #phi = phi / np.max(np.abs(phi))
+
         phi_hist.append(phi.copy())
 
     return phi, phi_hist
@@ -201,6 +213,63 @@ def SF_3(Img_0,max_iter,dt,b):
 
     return phi, phi_hist
 
+# reinitizaled con la reinitializaicon creada por mi
+def SF_4(Img_0,max_iter,dt,b):
+    #Discretización de la curva inicial (cuadrado)
+    N = Img_0.shape[0]
+    phi, dx = to_grid(square,N)
+    dx = float(dx)
+    #phi = skfmm.distance(phi, dx=dx, order=1)
+    phi, _, _, _ = reinit_fd(phi, max_iter * 10, dx, dt, b, smoothed_sgn_3, thresold=0.001)
+    phi_hist = [phi]
+
+    #Se calcula el gradiente de g compuesto con la norma del gradiente de Img_0
+    grad_I_x,grad_I_y = fd_gradient(Img_0,dx)
+    norm_grad_I  = np.sqrt( grad_I_x*grad_I_x + grad_I_y*grad_I_y)
+    g_I= g(norm_grad_I)
+    grad_gI_x,grad_gI_y = fd_gradient(g_I,dx)
+
+    for _ in range(max_iter):
+        # Compute the gradient of phi
+        grad_x,grad_y = fd_gradient(phi,dx)
+
+        #phi = np.pad(phi, 1, mode='maximum')
+        #phi = np.pad(phi, 1, mode='constant', constant_values=(0))
+        #phi = np.pad(phi, 1, mode='edge')
+        phi = np.pad(phi, 1, mode='constant', constant_values=(1))
+
+        # Compute the Laplacian using central difference scheme
+        laplacian = ((np.roll(phi, 1, axis=0) + np.roll(phi, -1, axis=0) + \
+                    np.roll(phi, 1, axis=1) + np.roll(phi, -1, axis=1) - \
+                    4 * phi) / (dx * dx))
+
+        #euler forward
+        slope1 = dt*b*laplacian[1:-1, 1:-1]*g_I
+        slope2 = dt*b*(grad_gI_x*grad_x + grad_gI_y*grad_y)
+
+        #Caso localmente color constante
+        for i in range(slope2.shape[0]):
+            for j in range(slope2.shape[1]):
+                if grad_I_x[i,j] == 0 and grad_I_y[i,j] == 0:
+                    slope2[i,j] = 0
+                    if laplacian[i+1,j+1] < 0.01: #Caso Curvatura Plana en color plano
+                        slope1[i,j] = 0.001
+
+
+        phi = phi[1:-1, 1:-1] + slope1 + slope2
+
+        #phi = phi[1:-1, 1:-1] + dt*b*laplacian[1:-1, 1:-1]*g_I + dt*b*(grad_gI_x*grad_x + grad_gI_y*grad_y)
+
+
+        #phi = skfmm.distance(phi, dx=dx, order=1)
+
+        phi, _, _, _ = reinit_fd(phi, max_iter * 10, dx, dt, b, smoothed_sgn_3, thresold=0.001)
+
+        phi_hist.append(phi.copy())
+
+
+    return phi, phi_hist
+
 if __name__ == '__main__':
     method = str(sys.argv[1])
     image_dir = str(sys.argv[2])
@@ -239,10 +308,13 @@ if __name__ == '__main__':
         test_rec, test_rec_hist = SF_2(image_array, max_iter, dt, b)
     elif method == '3':
         test_rec, test_rec_hist = SF_3(image_array, max_iter, dt, b)
+    elif method == '4':
+        test_rec, test_rec_hist = SF_4(image_array, max_iter, dt, b)
     else:
         sys.exit(0)
 
     print("El proceso se ha demorado --- %s segundos ---" % (time.time() - start_time))
+
 
     rec_anim = anima_array_imagen(test_rec_hist, title, image_array)
 
@@ -252,12 +324,13 @@ if __name__ == '__main__':
     if not os.path.exists('img_out'):
         os.makedirs('img_out')
 
-    while os.path.exists('anims/' + gif_title):
+    while os.path.exists('anims/' + gif_title) or os.path.exists('img_out/' + gif_title[:-4] + '.png'):
         from datetime import datetime
         gif_title = unique_filename(gif_title)
 
+    start_time = time.time()
     rec_anim.save('anims/' + gif_title, writer='pillow')
-
+    print("La creacion de la animacion se ha demorado --- %s segundos ---" % (time.time() - start_time))
     # Image saving
 
     fig = compound_image(image,test_rec_hist[-1])

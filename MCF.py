@@ -121,6 +121,6 @@ if __name__ == '__main__':
         from datetime import datetime
         gif_title = unique_filename(gif_title)
 
-
+    start_time = time.time()
     anima.save('anims/' + gif_title, writer='pillow')
-
+    print("La creacion de la animacion se ha demorado --- %s segundos ---" % (time.time() - start_time))

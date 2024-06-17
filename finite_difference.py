@@ -4,15 +4,23 @@ import numpy as np
 #Diferencias finitas para primeras derivadas
 # (second order central difference)
 def fd_gradient(phi_0,h, pad_val=1):
-    phi_pad = np.pad(phi_0, 1, mode='constant', constant_values=(pad_val))
+    if pad_val == 'edge':
+        phi_pad = np.pad(phi_0, 1, mode='edge',)
+    else:
+        phi_pad = np.pad(phi_0, 1, mode='constant', constant_values=(1))
+
     dif_x = (np.roll(phi_pad, -1, axis=1) - np.roll(phi_pad, 1, axis=1))/(2*h)
     dif_y = (np.roll(phi_pad, -1, axis=0) - np.roll(phi_pad, 1, axis=0))/(2*h)
 
     return dif_x[1:-1, 1:-1], dif_y[1:-1, 1:-1]
 
 #Diferencias finitas para segundas derivadas
-def fd_hessian(phi_0,h):
-    phi_pad = np.pad(phi_0, 1, mode='constant', constant_values=(1))
+def fd_hessian(phi_0,h, pad_val):
+    if pad_val == 'edge':
+        phi_pad = np.pad(phi_0, 1, mode='edge',)
+    else:
+        phi_pad = np.pad(phi_0, 1, mode='constant', constant_values=(1))
+
     dif_x = (np.roll(phi_pad, -1, axis=1) + np.roll(phi_pad, 1, axis=1) - 2*phi_pad)/(h*h)
     dif_y = (np.roll(phi_pad, -1, axis=0) + np.roll(phi_pad, 1, axis=0) - 2*phi_pad)/(h*h)
 
