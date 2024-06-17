@@ -207,3 +207,32 @@ def anima_VF_arr(hist,hist_x,hist_y,title,title2,interva=10,s_min = -1, s_max = 
     animation = matplotlib.animation.FuncAnimation(fig, animate, frames = len(hist_x) , interval = interva , repeat = True)
 
     return animation
+
+#Recibe una funcion y un imagen, retorna la imagen con el nivel 0 de la funcion encima
+def compound_image(img,f):
+    fig, ax = plt.subplots()
+
+    ax.imshow(img)
+    ax.contour(f, levels=[0], colors='red',extent=(0, img.size[0], 0, img.size[1]))
+
+    ax.axis('off')  # Turn off the axis
+    ax.xaxis.set_visible(False)  # Hide x-axis
+    ax.yaxis.set_visible(False)  # Hide y-axis
+
+    return fig
+
+import uuid
+
+#Dado un nombre de un gif, crea uno similar unico
+# EXtraido de chatgpt
+def unique_filename(filename):
+    # Split the filename and extension
+    name, ext = filename.rsplit('.', 1)
+
+    # Generate a unique identifier (using a UUID)
+    unique_id = str(uuid.uuid4())[:3]  # Extract first three characters of a UUID
+
+    # Construct the new filename
+    new_filename = f"{name}_{unique_id}.{ext}"
+
+    return new_filename

@@ -6,6 +6,8 @@ from  aux_functions import *
 from finite_difference import *
 from reinitialization import *
 import skfmm
+import time
+
 
 def MCF_1(phi_0,n_iter,dx,dt,b):
 
@@ -97,6 +99,8 @@ if __name__ == '__main__':
 
     phi_0, dx = to_grid(shape_f, N)
 
+    start_time = time.time()
+
     if method == '1':
         tmp_phi, tmp_phi_array = MCF_1(phi_0,max_iter,dx,dt,b)
     elif method == '2':
@@ -106,6 +110,8 @@ if __name__ == '__main__':
     else:
         sys.exit(0)
 
+    print("El proceso se ha demorado --- %s segundos ---" % (time.time() - start_time))
+
     anima = anima_array_2(tmp_phi_array, title)
 
     if not os.path.exists('anims'):
@@ -113,7 +119,7 @@ if __name__ == '__main__':
 
     while os.path.exists('anims/' + gif_title):
         from datetime import datetime
-        gif_title = gif_title + '-' + datetime.today().strftime('%Y-%m-%d')
+        gif_title = unique_filename(gif_title)
 
 
     anima.save('anims/' + gif_title, writer='pillow')

@@ -6,10 +6,14 @@ from PIL import Image
 from  aux_functions import *
 from finite_difference import *
 import skfmm
+import time
 
 # Square
 def square(x, y):
     return np.maximum(np.abs(x), np.abs(y)) - 0.9
+
+#def square(x,y):
+#    return (x + 0.5)**2 + (y - 0)**2 - 0.1**2
 #La funcion g del enunciado
 def g(x):
     return 1/(1+x*x)
@@ -227,6 +231,8 @@ if __name__ == '__main__':
 
     image_array = np.array(gray_image.resize((max_asp, max_asp))) / 255
 
+    start_time = time.time()
+
     if method == '1':
         test_rec, test_rec_hist = SF_1(image_array, max_iter, dt, b)
     elif method == '2':
@@ -236,15 +242,25 @@ if __name__ == '__main__':
     else:
         sys.exit(0)
 
+    print("El proceso se ha demorado --- %s segundos ---" % (time.time() - start_time))
+
     rec_anim = anima_array_imagen(test_rec_hist, title, image_array)
 
     if not os.path.exists('anims'):
         os.makedirs('anims')
 
+    if not os.path.exists('img_out'):
+        os.makedirs('img_out')
 
     while os.path.exists('anims/' + gif_title):
         from datetime import datetime
-        gif_title = gif_title + '-' + datetime.today().strftime('%Y-%m-%d')
+        gif_title = unique_filename(gif_title)
 
     rec_anim.save('anims/' + gif_title, writer='pillow')
+
+    # Image saving
+
+    fig = compound_image(image,test_rec_hist[-1])
+    gif_title = gif_title[:-4] + '.png'
+    fig.savefig('img_out/' + gif_title, bbox_inches='tight', pad_inches=0)
 
