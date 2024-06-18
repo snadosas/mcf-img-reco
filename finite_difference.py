@@ -36,6 +36,25 @@ def fd_gradient_nonsym(phi_0,h):
 
     return dif_x_forw[1:-1, 1:-1],dif_x_back[1:-1, 1:-1], dif_y_forw[1:-1, 1:-1],dif_y_back[1:-1, 1:-1]
 
+def upwind_differencing(a_x,a_y,phi_0,h):
+    x_forw, x_back, y_forw, y_back = fd_gradient_nonsym(phi_0, h)
+
+    x_grad = np.zeros_like(x_forw)
+    y_grad = np.zeros_like(x_forw)
+
+    for i in range(x_forw.shape[0]):
+        for j in range(x_forw.shape[0]):
+            if a_x[i,j] > 0:
+                x_grad[i,j] = x_back[i,j]
+            else:
+                x_grad[i,j] = x_forw[i,j]
+
+            if a_y[i,j] > 0:
+                y_grad[i,j] = y_back[i,j]
+            else:
+                y_grad[i,j] = y_forw[i,j]
+
+    return x_grad, y_grad
 #Elige que aproximacion usar de acuerdo al esquema de Gudonov
 def gudonov_choice(a,x_forw,x_back,y_forw,y_back):
     x_chosen = np.zeros(x_forw.shape)

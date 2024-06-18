@@ -48,10 +48,13 @@ def SF_1(Img_0,max_iter,dt,b):
                     np.roll(phi, 1, axis=1) + np.roll(phi, -1, axis=1) - \
                     4 * phi) / (dx * dx))
 
-        #euler forward
+        #euler forward (central differencing
         slope1 = dt*b*laplacian[1:-1, 1:-1]*g_I
-        slope2 = dt*b*(grad_gI_x*grad_x + grad_gI_y*grad_y)
 
+        #La idea es calcular slope2 con upwind differencing
+        #up_grad_x, up_grad_y = upwind_differencing(grad_gI_x, grad_gI_y, phi[1:-1, 1:-1], dx)
+        #slope2 = dt*b*(grad_gI_x*up_grad_x + grad_gI_y*up_grad_y )
+        slope2 =  dt * b * (grad_gI_x * grad_x + grad_gI_y * grad_y)
         #Caso localmente color constante
         for i in range(slope2.shape[0]):
             for j in range(slope2.shape[1]):
@@ -87,10 +90,6 @@ def SF_2(Img_0,max_iter,dt,b):
     g_I= g(norm_grad_I)
     grad_gI_x,grad_gI_y = fd_gradient(g_I,dx)
 
-    print("mg: ", np.max(np.abs(g_I)))
-    print("mgx: ", np.max(np.abs(grad_gI_x)))
-    print("mgy: ", np.max(np.abs(grad_gI_y)))
-
     for _ in range(max_iter):
 
         grad_x,grad_y = fd_gradient(phi,dx,'edge')
@@ -110,7 +109,9 @@ def SF_2(Img_0,max_iter,dt,b):
         print('deno: ',deno)
         print("------------")
         slope1 = dt*b*curv*g_I/deno
-        slope2 = dt*b*(grad_gI_x*grad_x + grad_gI_y*grad_y)
+        # La idea es calcular slope2 con upwind differencing
+        up_grad_x, up_grad_y = upwind_differencing(grad_gI_x, grad_gI_y, phi, dx)
+        slope2 = dt * b * (grad_gI_x * up_grad_x + grad_gI_y * up_grad_y)
 
         for i in range(phi.shape[0]):
             for j in range(phi.shape[1]):
@@ -245,7 +246,9 @@ def SF_4(Img_0,max_iter,dt,b):
 
         #euler forward
         slope1 = dt*b*laplacian[1:-1, 1:-1]*g_I
-        slope2 = dt*b*(grad_gI_x*grad_x + grad_gI_y*grad_y)
+        #La idea es calcular slope2 con upwind differencing
+        up_grad_x, up_grad_y = upwind_differencing(grad_gI_x, grad_gI_y, phi[1:-1, 1:-1], dx)
+        slope2 = dt*b*(grad_gI_x*up_grad_x + grad_gI_y*up_grad_y )
 
         #Caso localmente color constante
         for i in range(slope2.shape[0]):
@@ -263,7 +266,7 @@ def SF_4(Img_0,max_iter,dt,b):
 
         #phi = skfmm.distance(phi, dx=dx, order=1)
 
-        phi, _, _, _ = reinit_fd(phi, max_iter * 10, dx, dt, b, smoothed_sgn_3, thresold=0.001)
+        phi, _, _, _ = reinit_fd(phi, max_iter, dx, dt, b, smoothed_sgn_3, thresold=0.001)
 
         phi_hist.append(phi.copy())
 
