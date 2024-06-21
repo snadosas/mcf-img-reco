@@ -92,13 +92,13 @@ def reinit_fd(phi_0,n_iter,dx,dt,b, sgn_fn, thresold = 0.001):
         #print(np.sum( np.abs(slope) < thresold), phi_0.shape[0]*phi_0.shape[0]*0.8)
         #print('m' , np.mean(np.abs(slope)))
         if np.sum(np.abs(slope) < thresold ) > phi_0.shape[0]*phi_0.shape[0]*0.8 :
-            print("Breaking on :", i)
+            print("Breaking on :", i, end=', ')
             break
         #print('a',np.mean(n[1:-1, 1:-1]), '\t',np.max(n[1:-1, 1:-1]), '\t',np.min(n[1:-1, 1:-1]))
         #print('s',np.mean(s[1:-1, 1:-1]), '\t',np.max(s[1:-1, 1:-1]), '\t',np.min(s[1:-1, 1:-1]))
 
     if i == n_iter-1:
-        print("Max Iteration achieved")
+        print("Max Iteration achieved", end=', ')
         #sys.exit(0)
 
     return phi,phi_array, phi_x_array, phi_y_array

@@ -15,6 +15,7 @@ def square(x, y):
 
 #def square(x,y):
 #    return (x + 0.5)**2 + (y - 0)**2 - 0.1**2
+
 #La funcion g del enunciado
 def g(x):
     return 1/(1+x*x)
@@ -52,9 +53,9 @@ def SF_1(Img_0,max_iter,dt,b):
         slope1 = dt*b*laplacian[1:-1, 1:-1]*g_I
 
         #La idea es calcular slope2 con upwind differencing
-        #up_grad_x, up_grad_y = upwind_differencing(grad_gI_x, grad_gI_y, phi[1:-1, 1:-1], dx)
-        #slope2 = dt*b*(grad_gI_x*up_grad_x + grad_gI_y*up_grad_y )
-        slope2 =  dt * b * (grad_gI_x * grad_x + grad_gI_y * grad_y)
+        up_grad_x, up_grad_y = upwind_differencing(grad_gI_x, grad_gI_y, phi[1:-1, 1:-1], dx)
+        slope2 = dt*(grad_gI_x*up_grad_x + grad_gI_y*up_grad_y )
+        #slope2 =  dt * b * (grad_gI_x * grad_x + grad_gI_y * grad_y)
         #Caso localmente color constante
         for i in range(slope2.shape[0]):
             for j in range(slope2.shape[1]):
@@ -77,7 +78,7 @@ def SF_1(Img_0,max_iter,dt,b):
     return phi, phi_hist
 
 # Flujo segmentador
-def SF_2(Img_0,max_iter,dt,b):
+def SF_2(Img_0,max_iter,dt,b, sug_timestep = False):
     N = Img_0.shape[0]
     phi, dx = to_grid(square,N)
     dx = float(dx)
@@ -89,6 +90,11 @@ def SF_2(Img_0,max_iter,dt,b):
     norm_grad_I  = np.sqrt( grad_I_x*grad_I_x + grad_I_y*grad_I_y)
     g_I= g(norm_grad_I)
     grad_gI_x,grad_gI_y = fd_gradient(g_I,dx)
+
+    if sug_timestep:
+        suggestion = 1 / ( np.max(np.abs(grad_gI_x))/dx +   np.max(np.abs(grad_gI_y))/dx + (4*b)/(dx*dx) )
+        print("dt suggestion: ", suggestion)
+        dt = 0.9 * suggestion
 
     for _ in range(max_iter):
 
@@ -106,12 +112,12 @@ def SF_2(Img_0,max_iter,dt,b):
         deno = norm_grad + 0.01
         #print(np.mean(np.abs(deno)))
 
-        print('deno: ',deno)
-        print("------------")
+        #print('deno: ',deno)
+        #print("------------")
         slope1 = dt*b*curv*g_I/deno
         # La idea es calcular slope2 con upwind differencing
         up_grad_x, up_grad_y = upwind_differencing(grad_gI_x, grad_gI_y, phi, dx)
-        slope2 = dt * b * (grad_gI_x * up_grad_x + grad_gI_y * up_grad_y)
+        slope2 = dt * (grad_gI_x * up_grad_x + grad_gI_y * up_grad_y)
 
         for i in range(phi.shape[0]):
             for j in range(phi.shape[1]):
@@ -273,6 +279,139 @@ def SF_4(Img_0,max_iter,dt,b):
 
     return phi, phi_hist
 
+#Primitivo con RK
+def SF_5(Img_0,max_iter,dt,b, sug_timestep = False):
+    N = Img_0.shape[0]
+    phi, dx = to_grid(square,N)
+    dx = float(dx)
+    #phi = skfmm.distance(phi, dx=dx, order=1)
+    phi_hist = [phi]
+
+
+    grad_I_x,grad_I_y = fd_gradient(Img_0,dx, 'edge')
+    norm_grad_I  = np.sqrt( grad_I_x*grad_I_x + grad_I_y*grad_I_y)
+    g_I= g(norm_grad_I)
+    grad_gI_x,grad_gI_y = fd_gradient(g_I,dx)
+
+    if sug_timestep:
+        suggestion = 1 / ( np.max(np.abs(grad_gI_x))/dx +   np.max(np.abs(grad_gI_y))/dx + (4*b)/(dx*dx) )
+        print("dt suggestion: ", suggestion)
+        dt = 0.9 * suggestion
+
+    for _ in range(max_iter):
+
+        grad_x,grad_y = fd_gradient(phi,dx,'edge')
+        hess_x,hess_y = fd_hessian(phi,dx,'edge')
+        _, hess_xy = fd_gradient(grad_x,dx,'edge')
+
+        #print('gx: ', grad_x)
+
+        norm_grad =  grad_x * grad_x + grad_y * grad_y
+        curv = grad_x * grad_x * hess_y - 2 * grad_x * grad_y * hess_xy  + grad_y * grad_y * hess_x
+
+        #print('c: ', curv)
+
+        deno = norm_grad + 0.01
+        #print(np.mean(np.abs(deno)))
+
+        #print('deno: ',deno)
+        #print("------------")
+        slope1 = dt*b*curv*g_I/deno
+        # La idea es calcular slope2 con upwind differencing
+        up_grad_x, up_grad_y = upwind_differencing(grad_gI_x, grad_gI_y, phi, dx)
+        slope2 = dt * (grad_gI_x * up_grad_x + grad_gI_y * up_grad_y)
+
+        for i in range(phi.shape[0]):
+            for j in range(phi.shape[1]):
+                if grad_I_x[i,j] < 0.001 and grad_I_y[i,j] < 0.001:
+                    slope2[i,j] = 0
+
+        phi1 = phi + slope1 + slope2
+
+        #phi2
+        grad_x,grad_y = fd_gradient(phi1,dx,'edge')
+        hess_x,hess_y = fd_hessian(phi1,dx,'edge')
+        _, hess_xy = fd_gradient(grad_x,dx,'edge')
+
+        #print('gx: ', grad_x)
+
+        norm_grad =  grad_x * grad_x + grad_y * grad_y
+        curv = grad_x * grad_x * hess_y - 2 * grad_x * grad_y * hess_xy  + grad_y * grad_y * hess_x
+
+        #print('c: ', curv)
+
+        deno = norm_grad + 0.01
+        #print(np.mean(np.abs(deno)))
+
+        #print('deno: ',deno)
+        #print("------------")
+        slope1 = dt*b*curv*g_I/deno
+        # La idea es calcular slope2 con upwind differencing
+        up_grad_x, up_grad_y = upwind_differencing(grad_gI_x, grad_gI_y, phi1, dx)
+        slope2 = dt * (grad_gI_x * up_grad_x + grad_gI_y * up_grad_y)
+
+        for i in range(phi.shape[0]):
+            for j in range(phi.shape[1]):
+                if grad_I_x[i,j] < 0.001 and grad_I_y[i,j] < 0.001:
+                    slope2[i,j] = 0
+
+        phi2 = phi1 + slope1 + slope2
+
+
+        phi12 = 0.75*phi + 0.25*phi2
+
+        #phi32
+        grad_x, grad_y = fd_gradient(phi12, dx, 'edge')
+        hess_x, hess_y = fd_hessian(phi12, dx, 'edge')
+        _, hess_xy = fd_gradient(grad_x, dx, 'edge')
+
+        # print('gx: ', grad_x)
+
+        norm_grad = grad_x * grad_x + grad_y * grad_y
+        curv = grad_x * grad_x * hess_y - 2 * grad_x * grad_y * hess_xy + grad_y * grad_y * hess_x
+
+        # print('c: ', curv)
+
+        deno = norm_grad + 0.01
+        # print(np.mean(np.abs(deno)))
+
+        # print('deno: ',deno)
+        # print("------------")
+        slope1 = dt * b * curv * g_I / deno
+        # La idea es calcular slope2 con upwind differencing
+        up_grad_x, up_grad_y = upwind_differencing(grad_gI_x, grad_gI_y, phi12, dx)
+        slope2 = dt * (grad_gI_x * up_grad_x + grad_gI_y * up_grad_y)
+
+        for i in range(phi.shape[0]):
+            for j in range(phi.shape[1]):
+                if grad_I_x[i, j] < 0.001 and grad_I_y[i, j] < 0.001:
+                    slope2[i, j] = 0
+
+        phi32 = phi12 + slope1 + slope2
+        #phi = skfmm.distance(phi, dx=dx, order=1)
+
+        phi = phi/3 + 2*phi32/3
+        # normalization routine
+        '''for i in range(phi.shape[0]):
+            for j in range(phi.shape[0]):
+                if phi[i,j] > 1:
+                    phi[i,j] = 1
+                elif phi[i,j] < -1 :
+                    phi[i, j] = -1
+
+        from scipy.ndimage import gaussian_filter
+
+        phi =  gaussian_filter(phi, sigma=0.1)
+        #print('max: ', np.max(np.abs(phi)))'''
+
+        # second normalization routine
+        #print('max:', np.max(np.abs(phi)))
+        #phi = phi / np.max(np.abs(phi))
+
+        phi_hist.append(phi.copy())
+
+    return phi, phi_hist
+
 if __name__ == '__main__':
     method = str(sys.argv[1])
     image_dir = str(sys.argv[2])
@@ -282,8 +421,15 @@ if __name__ == '__main__':
     b = float(sys.argv[6])
     if len(sys.argv) == 8:
         gif_title = sys.argv[7]
+    elif len(sys.argv) == 9:
+        gif_title = sys.argv[7]
+        anim_flag = int(sys.argv[8])
     else:
         gif_title = 'SegmentFlow.gif'
+        anim_flag = True
+
+    print(len(sys.argv))
+    print(anim_flag)
 
     title = 'Segmenting Flow'
 
@@ -308,7 +454,7 @@ if __name__ == '__main__':
     if method == '1':
         test_rec, test_rec_hist = SF_1(image_array, max_iter, dt, b)
     elif method == '2':
-        test_rec, test_rec_hist = SF_2(image_array, max_iter, dt, b)
+        test_rec, test_rec_hist = SF_5(image_array, max_iter, dt, b, True)
     elif method == '3':
         test_rec, test_rec_hist = SF_3(image_array, max_iter, dt, b)
     elif method == '4':
@@ -318,8 +464,6 @@ if __name__ == '__main__':
 
     print("El proceso se ha demorado --- %s segundos ---" % (time.time() - start_time))
 
-
-    rec_anim = anima_array_imagen(test_rec_hist, title, image_array)
 
     if not os.path.exists('anims'):
         os.makedirs('anims')
@@ -331,9 +475,11 @@ if __name__ == '__main__':
         from datetime import datetime
         gif_title = unique_filename(gif_title)
 
-    start_time = time.time()
-    rec_anim.save('anims/' + gif_title, writer='pillow')
-    print("La creacion de la animacion se ha demorado --- %s segundos ---" % (time.time() - start_time))
+    if anim_flag:
+        start_time = time.time()
+        rec_anim = anima_array_imagen(test_rec_hist, title, image_array)
+        rec_anim.save('anims/' + gif_title, writer='pillow')
+        print("La creacion de la animacion se ha demorado --- %s segundos ---" % (time.time() - start_time))
     # Image saving
 
     fig = compound_image(image,test_rec_hist[-1])
