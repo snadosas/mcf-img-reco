@@ -428,9 +428,6 @@ if __name__ == '__main__':
         gif_title = 'SegmentFlow.gif'
         anim_flag = True
 
-    print(len(sys.argv))
-    print(anim_flag)
-
     title = 'Segmenting Flow'
 
     #Rutina para importar imagen usando pillow sugerido por CHATGPT
