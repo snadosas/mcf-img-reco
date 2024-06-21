@@ -53,13 +53,13 @@ def SF_1(Img_0,max_iter,dt,b):
         slope1 = dt*b*laplacian[1:-1, 1:-1]*g_I
 
         #La idea es calcular slope2 con upwind differencing
-        up_grad_x, up_grad_y = upwind_differencing(grad_gI_x, grad_gI_y, phi[1:-1, 1:-1], dx)
-        slope2 = dt*(grad_gI_x*up_grad_x + grad_gI_y*up_grad_y )
-        #slope2 =  dt * b * (grad_gI_x * grad_x + grad_gI_y * grad_y)
+        #up_grad_x, up_grad_y = upwind_differencing(grad_gI_x, grad_gI_y, phi[1:-1, 1:-1], dx)
+        #slope2 = dt*(grad_gI_x*up_grad_x + grad_gI_y*up_grad_y )
+        slope2 =  dt * b * (grad_gI_x * grad_x + grad_gI_y * grad_y)
         #Caso localmente color constante
         for i in range(slope2.shape[0]):
             for j in range(slope2.shape[1]):
-                if grad_I_x[i,j] == 0 and grad_I_y[i,j] == 0:
+                if np.abs(grad_I_x[i,j]) <= 2/(255*dx) and np.abs(grad_I_y[i,j]) <= 2/(255*dx):
                     slope2[i,j] = 0
                     if laplacian[i+1,j+1] < 0.01: #Caso Curvatura Plana en color plano
                         slope1[i,j] = 0.001
@@ -483,6 +483,6 @@ if __name__ == '__main__':
     # Image saving
 
     fig = compound_image(image,test_rec_hist[-1])
-    gif_title = gif_title[:-4] + '.png'
+    gif_title = gif_title + '.png'
     fig.savefig('img_out/' + gif_title, bbox_inches='tight', pad_inches=0)
 
