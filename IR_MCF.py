@@ -425,7 +425,7 @@ if __name__ == '__main__':
         gif_title = sys.argv[7]
         anim_flag = int(sys.argv[8])
     else:
-        gif_title = 'SegmentFlow.gif'
+        gif_title = 'SegmentFlow'
         anim_flag = True
 
     title = 'Segmenting Flow'
@@ -468,9 +468,12 @@ if __name__ == '__main__':
     if not os.path.exists('img_out'):
         os.makedirs('img_out')
 
-    while os.path.exists('anims/' + gif_title) or os.path.exists('img_out/' + gif_title[:-4] + '.png'):
+    #title detail appending
+    gif_title = gif_title + "_met" + str(method) + "_res" + str(desired_res) + "_iter" + str(max_iter) + "_dt" + str(dt) + "_b" + str(b)
+
+    while os.path.exists('anims/' + gif_title + '.gif') or os.path.exists('img_out/' + gif_title + '.png'):
         from datetime import datetime
-        gif_title = unique_filename(gif_title)
+        gif_title = unique_filename(gif_title + '.gif')[:-4]
 
     if anim_flag:
         start_time = time.time()
