@@ -55,6 +55,7 @@ def SF_1(Img_0,max_iter,dt,b):
         #La idea es calcular slope2 con upwind differencing
         #up_grad_x, up_grad_y = upwind_differencing(grad_gI_x, grad_gI_y, phi[1:-1, 1:-1], dx)
         #slope2 = dt*(grad_gI_x*up_grad_x + grad_gI_y*up_grad_y )
+
         slope2 =  dt * b * (grad_gI_x * grad_x + grad_gI_y * grad_y)
         #Caso localmente color constante
         for i in range(slope2.shape[0]):
@@ -320,12 +321,12 @@ def SF_5(Img_0,max_iter,dt,b, sug_timestep = False):
         # La idea es calcular slope2 con upwind differencing
         up_grad_x, up_grad_y = upwind_differencing(grad_gI_x, grad_gI_y, phi, dx)
         slope2 = dt * (grad_gI_x * up_grad_x + grad_gI_y * up_grad_y)
-
+        '''
         for i in range(phi.shape[0]):
             for j in range(phi.shape[1]):
                 if grad_I_x[i,j] < 0.001 and grad_I_y[i,j] < 0.001:
                     slope2[i,j] = 0
-
+        '''
         phi1 = phi + slope1 + slope2
 
         #phi2
@@ -349,12 +350,12 @@ def SF_5(Img_0,max_iter,dt,b, sug_timestep = False):
         # La idea es calcular slope2 con upwind differencing
         up_grad_x, up_grad_y = upwind_differencing(grad_gI_x, grad_gI_y, phi1, dx)
         slope2 = dt * (grad_gI_x * up_grad_x + grad_gI_y * up_grad_y)
-
+        '''
         for i in range(phi.shape[0]):
             for j in range(phi.shape[1]):
                 if grad_I_x[i,j] < 0.001 and grad_I_y[i,j] < 0.001:
                     slope2[i,j] = 0
-
+            '''
         phi2 = phi1 + slope1 + slope2
 
 
@@ -381,12 +382,12 @@ def SF_5(Img_0,max_iter,dt,b, sug_timestep = False):
         # La idea es calcular slope2 con upwind differencing
         up_grad_x, up_grad_y = upwind_differencing(grad_gI_x, grad_gI_y, phi12, dx)
         slope2 = dt * (grad_gI_x * up_grad_x + grad_gI_y * up_grad_y)
-
+        '''
         for i in range(phi.shape[0]):
             for j in range(phi.shape[1]):
                 if grad_I_x[i, j] < 0.001 and grad_I_y[i, j] < 0.001:
                     slope2[i, j] = 0
-
+        '''
         phi32 = phi12 + slope1 + slope2
         #phi = skfmm.distance(phi, dx=dx, order=1)
 
@@ -478,7 +479,7 @@ if __name__ == '__main__':
     if anim_flag:
         start_time = time.time()
         rec_anim = anima_array_imagen(test_rec_hist, title, image_array)
-        rec_anim.save('anims/' + gif_title, writer='pillow')
+        rec_anim.save('anims/' + gif_title + '.gif', writer='pillow')
         print("La creacion de la animacion se ha demorado --- %s segundos ---" % (time.time() - start_time))
     # Image saving
 

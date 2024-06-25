@@ -4,6 +4,16 @@ This repository contains the code of our project for the **Numerical Analysis of
 
 The outline of the project is to first simulate mean curvature flow using finite differences, and then modify the flow so that it can recognize images.
 
+## State of the repository
+
+At the time of this commit, we don't plan to keep updating the repository as the project has finished, the state of the methods that shall later be mentioned is:
+- MCF.py:
+  - All the three methods work fine, but the best is method 3 that uses scikitfmm, method 2 may have slow times under unlucky parameters and may need manual adjusting
+- IR_MCF.py
+  - Method 2 does not work in almost all cases, a programming error is suspected.
+  - Method 4 work in some cases, it's heavily dependent on manual adjusting so that the reinitialization PDEs can be solved quickly.
+  - Method 1 works well
+  - Method 3 does not currently work as it does not have a heuristic, this one should be considered deprecated and not useable.
 ## Usage
 
 Clone the repo and open a terminal in the folder of the repo and run 
@@ -32,12 +42,14 @@ Such line will produce a gif in `/anims/gif_title`.
 
 ``IR_MCF.py`` contains the code related to the simulation of a square on the corners on an image, such square will be under the motion of a ''mean curvature''-like flow that stops it's movement when there is a great change in the gradient of the image.
 
-`` python IR_MCF.py method image_dir N_factor n_iter dt b gif_title``
+`` python IR_MCF.py method image_dir N_factor n_iter dt b gif_title anim_flag``
 
 Where:
 - **method** : An integer that refers to the method used to calculate the flow
   - 1 : Uses signed distance function from the scikit.fmm library and the simplified flow equation.
   - 2 : Uses finite differences the approximate the curvature and the norm of the gradient directly.
+  - 3 : A modification of method 1 that uses Runge Kutta (deprecated)
+  - 4: Uses signed distance function obtained from finite differences and the simplified flow equation.
     (More on those methods can be found in the **context** section)
 - **image_dir**: Directory of the image.
 - **desired_res** : Refers to the resolution of the image that will be used in the code. 
@@ -45,25 +57,32 @@ Where:
 - **dt** : Size of the time step.
 - **b** : Size of the velocity of the flow.
 - **gif_title** : Title of the gif to be created.
-
+- **anim_flag** : If set to 1, then an animation will be created.
 ## Examples
 
 ` python MCF.py 1 'circle'  25 200 0.1 0.01 'circle_example.gif'`
 
 ![circle example](/anims/circle_example.gif)
 
+`python MCF.py 1 '(x**2+y**2)**3 - 4*(x**2)*(y**2)'  50 150 0.1 0.01 'flower_example.gif'`
+
+![flower example](/anims/flower_example_met2.gif)
+
 `python MCF.py 3 'heart' 30 150 0.1 0.01 'heart_example.gif'`
 
 ![heart example](/anims/heart_example.gif)
 
-`python .\IR_MCF.py 2 'img/circle.png' 4 200 0.05 0.01 'SF_circle.gif'` 
 
-![circle_reco example](/anims/SF_circle.gif)
+`python .\IR_MCF.py 1 'img/twoapples.jpg' 80 1000 0.05 0.01 'twoapples' 1`
 
-`python .\IR_MCF.py 1 'img/circle.png' 64 800 0.05 0.01 'SF_bean3.gif'` 
+![apple example](/anims/twoapples_met1_res80_iter1000_dt0.05_b0.01_eef.gif)
 
-![bean_reco example](/anims/SF_bean3.gif)
+`python .\IR_MCF.py 4 'img/cat_bg.png' 50 600 0.001 0.01 'catto' 1`
 
+![apple example](/anims/catto_met4_res50_iter600_dt0.001_b0.01.gif)
+
+
+cat_bg_met4_res50_iter425_dt0.01_b0.01
 ## Context
 
 ### Mean Curvature Flow
@@ -90,6 +109,20 @@ this is the case when $\varphi$ is a signed distance function, that is, $|\varph
 
 ### Finite Differences
 
+Method 1 in MCF.py uses centralized differences to calculate the curvature, this seems to be enough due to the dissipative nature of the equation.
+$$D^+_x \varphi_{i,j} = \frac{\varphi_{i+1,j}-\varphi_{i,j}}{\Delta x}\quad,D^-_x \varphi_{i,j} = \frac{\varphi_{i,j}-\varphi_{i-1,j}}{\Delta x}\quad,D^0_x \varphi_{i,j} = \frac{\varphi_{i+1,j}-\varphi_{i-1,j}}{2\Delta x}$$
+
+Where the second order derivatives are calculated as follows: $\varphi_{xy} = D^0_y D^0_x \varphi, \varphi_{xx} =D^-_x D^+_x \varphi$. 
+
+Method 2 and 3 in MCF.py a five-point stencil finite-difference is used for the laplacian.
+$$\Delta \varphi_{i,j} = \frac{\varphi_{i,j-1}+\varphi_{i,j+1}+\varphi_{i-1,j}+\varphi_{i+1,j}-4\varphi_{i,j}}{(\Delta x)^2}$$
+
+Method 2 uses the Rouy-Touring Formula to calculate the norm of the gradient.
+
+If $S(\varphi_0) > 0$ set $\varphi_x ^2 \approx \max(\max(\Delta^{-}_{x} \varphi, 0)^2,\min(\Delta^{+}_{x} \varphi,0)^2)$. 
+
+If $S(\varphi_{0})<0$ set $\varphi_{x}^{2}\approx \max(\min (\Delta^{-}_{x} \varphi,\max(\Delta^{+}_{x} \varphi,0)^{2})$.
+
 ### Image Recognition
 
 Consider a grayscale image $A$, such image can be discretized into a matrix $I$ where each entry represents the brightness of a pixel, one wishes for the flow to stop itself when there's a jump on $|\nabla I|$, that is, a big change of brightness, this is accomplished by solving the following PDE.
@@ -102,10 +135,7 @@ Where $g$ is a positive strictly decreasing function such that $g(0) = 1$ and $\
 
 One such $g$ is $g(x) = (1+x^2)^{-1}$.
 
-## To Do List
-- Fix the method 2 in `MCF.py`
-- Fix `IR_MCF.py`
-- Add the Finite Differences Context
+
 
 ## References
 
