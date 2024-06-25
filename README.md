@@ -42,7 +42,7 @@ Such line will produce a gif in `/anims/gif_title`.
 
 ``IR_MCF.py`` contains the code related to the simulation of a square on the corners on an image, such square will be under the motion of a ''mean curvature''-like flow that stops it's movement when there is a great change in the gradient of the image.
 
-`` python IR_MCF.py method image_dir N_factor n_iter dt b title anim_flag``
+`` python IR_MCF.py method image_dir N_factor n_iter dt b filename anim_flag``
 
 Where:
 - **method** : An integer that refers to the method used to calculate the flow
