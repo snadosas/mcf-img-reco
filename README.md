@@ -110,7 +110,7 @@ this is the case when $\varphi$ is a signed distance function, that is, $|\varph
 ### Finite Differences
 
 Method 1 in MCF.py uses centralized differences to calculate the curvature, this seems to be enough due to the dissipative nature of the equation.
-$$D^+_x \varphi_{i,j} = \frac{\varphi_{i+1,j}-\varphi_{i,j}}{\Delta x}\quad,D^-_x \varphi_{i,j} = \frac{\varphi_{i,j}-\varphi_{i-1,j}}{\Delta x}\quad,D^0_x \varphi_{i,j} = \frac{\varphi_{i+1,j}-\varphi_{i-1,j}}{2\Delta x}$$
+$$D^{+}_{x} \varphi_{i,j} = \frac{\varphi_{i+1,j}-\varphi_{i,j}}{\Delta x},D^{-}_{x} \varphi_{i,j} = \frac{\varphi_{i,j}-\varphi_{i-1,j}}{\Delta x},D^{0}_{x} \varphi_{i,j} = \frac{\varphi_{i+1,j}-\varphi_{i-1,j}}{2\Delta x}$$
 
 Where the second order derivatives are calculated as follows: $\varphi_{xy} = D^0_y D^0_x \varphi, \varphi_{xx} =D^-_x D^+_x \varphi$. 
 
@@ -119,9 +119,9 @@ $$\Delta \varphi_{i,j} = \frac{\varphi_{i,j-1}+\varphi_{i,j+1}+\varphi_{i-1,j}+\
 
 Method 2 uses the Rouy-Touring Formula to calculate the norm of the gradient.
 
-If $S(\varphi_0) > 0$ set $\varphi_x ^2 \approx \max(\max(\Delta^{-}_{x} \varphi, 0)^2,\min(\Delta^{+}_{x} \varphi,0)^2)$. 
+If $S(\varphi_0) > 0$ set $\varphi_x ^2 = \max(\max(\Delta^{-}_{x} \varphi, 0)^2,\min(\Delta^{+}_{x} \varphi,0)^2)$. 
 
-If $S(\varphi_{0})<0$ set $\varphi_{x}^{2}\approx \max(\min (\Delta^{-}_{x} \varphi,\max(\Delta^{+}_{x} \varphi,0)^{2})$.
+If $S(\varphi_{0})<0$ set $\varphi_{x}^{2} = \max(\min (\Delta^{-}_{x} \varphi,\max(\Delta^{+}_{x} \varphi,0)^{2})$.
 
 ### Image Recognition
 
