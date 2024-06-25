@@ -127,15 +127,15 @@ Method 1 in MCF.py uses centralized differences to calculate the curvature, this
 Where the second order derivatives are calculated as follows: $\varphi_{xy} = D^0_y D^0_x \varphi, \varphi_{xx} =D^-_x D^+_x \varphi$. 
 
 Method 2 and 3 in MCF.py a five-point stencil finite-difference is used for the laplacian.
-$$
+```math
 \Delta \varphi_{i,j} = \frac{\varphi_{i,j-1}+\varphi_{i,j+1}+\varphi_{i-1,j}+\varphi_{i+1,j}-4\varphi_{i,j}}{(\Delta x)^2}
-$$
+```
 
 Method 2 uses the Rouy-Touring Formula to calculate the norm of the gradient.
 
-If $S(\varphi_0) > 0$ set $\varphi_x ^2 = \max(\max(\Delta^{-}_{x} \varphi, 0)^2,\min(\Delta^{+}_{x} \varphi,0)^2)$. 
+If $S(\varphi_0) > 0$ set ```math\varphi_x ^2 = \max(\max(\Delta^{-}_{x} \varphi, 0)^2,\min(\Delta^{+}_{x} \varphi,0)^2)```. 
 
-If $S(\varphi_{0})<0$ set $\varphi_{x}^{2} = \max(\min (\Delta^{-}_{x} \varphi,\max(\Delta^{+}_{x} \varphi,0)^{2})$.
+If $S(\varphi_{0})<0$ set ```math\varphi_{x}^{2} = \max(\min (\Delta^{-}_{x} \varphi,\max(\Delta^{+}_{x} \varphi,0)^{2})```.
 
 ### Image Recognition
 
