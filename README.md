@@ -112,7 +112,7 @@ this is the case when $\varphi$ is a signed distance function, that is, $|\varph
 Method 1 in MCF.py uses centralized differences to calculate the curvature, this seems to be enough due to the dissipative nature of the equation.
 
 $$
-D^{+}_{x} \varphi_{ij} = \frac{\varphi-\varphi}{\Delta x}
+D^{+}_{x} \varphi_{yy} = \frac{\varphi-\varphi}{\Delta x}
 $$
 
 $$
