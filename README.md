@@ -116,7 +116,9 @@ $$D^{+}_{x} \varphi_{i,j} = \frac{\varphi_{i+1,j}-\varphi_{i,j}}{\Delta x},D^{-}
 Where the second order derivatives are calculated as follows: $\varphi_{xy} = D^0_y D^0_x \varphi, \varphi_{xx} =D^-_x D^+_x \varphi$. 
 
 Method 2 and 3 in MCF.py a five-point stencil finite-difference is used for the laplacian.
-$$\Delta \varphi_{i,j} = \frac{\varphi_{i,j-1}+\varphi_{i,j+1}+\varphi_{i-1,j}+\varphi_{i+1,j}-4\varphi_{i,j}}{(\Delta x)^2}$$
+$$
+\Delta \varphi_{i,j} = \frac{\varphi_{i,j-1}+\varphi_{i,j+1}+\varphi_{i-1,j}+\varphi_{i+1,j}-4\varphi_{i,j}}{(\Delta x)^2}
+$$
 
 Method 2 uses the Rouy-Touring Formula to calculate the norm of the gradient.
 
