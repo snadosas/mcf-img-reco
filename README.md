@@ -42,7 +42,7 @@ Such line will produce a gif in `/anims/gif_title`.
 
 ``IR_MCF.py`` contains the code related to the simulation of a square on the corners on an image, such square will be under the motion of a ''mean curvature''-like flow that stops it's movement when there is a great change in the gradient of the image.
 
-`` python IR_MCF.py method image_dir N_factor n_iter dt b gif_title anim_flag``
+`` python IR_MCF.py method image_dir N_factor n_iter dt b title anim_flag``
 
 Where:
 - **method** : An integer that refers to the method used to calculate the flow
@@ -56,8 +56,11 @@ Where:
 - **n_iter** : Refers to the number of steps the curve will be evolved due to the flow.
 - **dt** : Size of the time step.
 - **b** : Size of the velocity of the flow.
-- **gif_title** : Title of the gif to be created.
+- **filename** : filename of the png/gif to be created.
 - **anim_flag** : If set to 1, then an animation will be created.
+
+Such line will create a png `/img_out/filename.png` and if **anim_flag** is set, it will produce a gif in `/anims/filename.gif`.
+
 ## Examples
 
 ` python MCF.py 1 'circle'  25 200 0.1 0.01 'circle_example.gif'`
