@@ -133,9 +133,15 @@ Method 2 and 3 in MCF.py a five-point stencil finite-difference is used for the 
 
 Method 2 uses the Rouy-Touring Formula to calculate the norm of the gradient.
 
-If $S(\varphi_0) > 0$ set ```math\varphi_x ^2 = \max(\max(\Delta^{-}_{x} \varphi, 0)^2,\min(\Delta^{+}_{x} \varphi,0)^2)```. 
+If $S(\varphi_0) > 0$ set 
+```math
+\varphi_x ^2 = \max(\max(\Delta^{-}_{x} \varphi, 0)^2,\min(\Delta^{+}_{x} \varphi,0)^2)
+```
 
-If $S(\varphi_{0})<0$ set ```math\varphi_{x}^{2} = \max(\min (\Delta^{-}_{x} \varphi,\max(\Delta^{+}_{x} \varphi,0)^{2})```.
+If $S(\varphi_{0})<0$ set 
+```math
+\varphi_{x}^{2} = \max(\min (\Delta^{-}_{x} \varphi,\max(\Delta^{+}_{x} \varphi,0)^{2})
+```
 
 ### Image Recognition
 
