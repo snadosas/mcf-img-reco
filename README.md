@@ -82,7 +82,6 @@ Where:
 ![apple example](/anims/catto_met4_res50_iter600_dt0.001_b0.01.gif)
 
 
-cat_bg_met4_res50_iter425_dt0.01_b0.01
 ## Context
 
 ### Mean Curvature Flow
