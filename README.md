@@ -134,12 +134,12 @@ Method 2 uses the Rouy-Touring Formula to calculate the norm of the gradient.
 
 If $S(\varphi_0) > 0$ set 
 ```math
-\varphi_x ^2 = \max(\max(\Delta^{-}_{x} \varphi, 0)^2,\min(\Delta^{+}_{x} \varphi,0)^2)
+\varphi_x ^2 = \max(\max(\D^{-}_{x} \varphi, 0)^2,\min(\D^{+}_{x} \varphi,0)^2)
 ```
 
 If $S(\varphi_{0})<0$ set 
 ```math
-\varphi_{x}^{2} = \max(\min (\Delta^{-}_{x} \varphi,\max(\Delta^{+}_{x} \varphi,0)^{2})
+\varphi_{x}^{2} = \max(\min (\D^{-}_{x} \varphi,\max(\D^{+}_{x} \varphi,0)^{2})
 ```
 
 ### Image Recognition
